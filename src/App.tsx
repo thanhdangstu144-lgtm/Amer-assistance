@@ -241,9 +241,9 @@ export default function App() {
     const currentVariant = selectedProduct?.variants[selectedVariantIdx];
     const productInfo = selectedProduct ? 
       `Sản phẩm: ${selectedProduct.name}. Màu: ${currentVariant?.color}. Giá: ${selectedProduct.price}đ. Size: ${selectedProduct.size}. Form: ${selectedProduct.form}. Mô tả: ${selectedProduct.description}` : 
-      "Gợi ý tư vấn phong cách Amer Hub (phủi bụi, nam tính, tối giản nhưng chất).";
+      "Gợi ý tư vấn phong cách Amer assistance (phủi bụi, nam tính, tối giản nhưng chất).";
 
-    const systemPrompt = `Bạn là trợ lý Amer Hub. Phản hồi khách hàng cực kỳ tự nhiên, "phủi bụi", thân thiện như bạn bè đam mê thời trang.
+    const systemPrompt = `Bạn là trợ lý Amer assistance. Phản hồi khách hàng cực kỳ tự nhiên, "phủi bụi", thân thiện như bạn bè đam mê thời trang.
     DỮ LIỆU SẢN PHẨM HIỆN TẠI (nếu có): ${productInfo}
     YÊU CẦU:
     - Không dùng văn mẫu robot. Không lặp lại lời chào rập khuôn.
@@ -315,12 +315,16 @@ export default function App() {
   const copyImage = async (url: string) => {
     if (!url) return;
     try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const item = new ClipboardItem({ [blob.type]: blob });
-      await navigator.clipboard.write([item]);
+      setCopyToast('processing');
+      // Using Promise in ClipboardItem for better mobile/iOS compatibility
+      const data = [new ClipboardItem({ 
+        'image/png': fetch(url).then(r => r.blob()) 
+      })];
+      await navigator.clipboard.write(data);
       showToast('image');
     } catch (err) {
+      console.error('Copy failed:', err);
+      // Fallback for some browsers
       window.open(url, '_blank');
       showToast('fallback');
     }
@@ -419,7 +423,7 @@ export default function App() {
               <input id="avatarInput" type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg tracking-tight leading-none">Amer app</span>
+              <span className="font-bold text-lg tracking-tight leading-none">Amer assistance</span>
               <span className="text-[10px] text-apple-secondary-text font-semibold mt-1">Smart Assistant</span>
             </div>
           </div>
@@ -700,11 +704,11 @@ export default function App() {
                             <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Gallery (Copy High-Res)</span>
                             <div className="flex gap-1.5 sm:gap-2">
                               {(variant.subImages || [null, null, null, null]).slice(0, 4).map((img, i) => (
-                                <div key={i} className="w-8 h-8 sm:w-16 sm:h-16 bg-apple-secondary rounded-lg sm:rounded-xl overflow-hidden border border-apple-border/40 cursor-pointer hover:border-apple-blue transition-colors group/sub" onClick={() => img && copyImage(img)}>
+                                <div key={i} className="w-8 h-8 sm:w-16 sm:h-16 bg-apple-secondary rounded-lg sm:rounded-xl overflow-hidden border border-apple-border/40 cursor-pointer hover:border-apple-blue transition-all group/sub active:scale-90" onClick={() => img && copyImage(img)}>
                                   {img ? <img src={img} className="w-full h-full object-cover group-hover/sub:scale-110 transition-transform" /> : <ImageIcon size={10} className="m-auto opacity-10" />}
                                 </div>
                               ))}
-                              <div className="w-8 h-8 sm:w-16 sm:h-16 bg-slate-900 rounded-lg sm:rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/10" onClick={() => copyAllSubImages(variant.subImages)}>
+                              <div className="w-8 h-8 sm:w-16 sm:h-16 bg-slate-900 rounded-lg sm:rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-90" onClick={() => copyAllSubImages(variant.subImages)}>
                                 <Download size={14} className="text-white" />
                               </div>
                             </div>
@@ -849,15 +853,15 @@ export default function App() {
           >
              {copyToast === 'processing' ? <RefreshCw className="animate-spin text-white/50" size={16} /> : (copyToast === 'error' ? <X className="text-red-400" size={16} /> : <div className="w-1.5 h-1.5 rounded-full bg-apple-blue shadow-[0_0_10px_#0066CC]"></div>)}
              <span className="text-xs font-bold tracking-tight">
-               {copyToast === 'processing' ? 'Processing Synthesis...' : 
-                copyToast === 'image' ? 'Reference Captured' : 
+               {copyToast === 'processing' ? 'Processing...' : 
+                copyToast === 'image' ? 'Image Copied' : 
                 copyToast === 'error' ? 'Transmission Failed' :
                 copyToast === 'fallback' ? 'External Reference Opened' : 
                 copyToast === 'saved' ? 'Archive Updated' : 
-                copyToast === 'info' ? 'Statement Archived' :
-                copyToast === 'no_images' ? 'No Visuals Found' :
-                copyToast === 'all_images' ? 'Collage Synthesis Complete' :
-                copyToast === 'copied' ? 'Dialect Copied' :
+                copyToast === 'info' ? 'Product Info Copied' :
+                copyToast === 'no_images' ? 'No Images Found' :
+                copyToast === 'all_images' ? 'Collage Copied' :
+                copyToast === 'copied' ? 'Response Copied' :
                 'Success'}
              </span>
           </motion.div>
