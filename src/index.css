@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-apple-bg: #F5F5F7;
+  --color-apple-secondary: #E8E8ED;
+  --color-apple-surface: #FFFFFF;
+  --color-apple-text: #1D1D1F;
+  --color-apple-secondary-text: #6E6E73;
+  --color-apple-blue: #0066CC;
+  --color-apple-border: rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-apple-bg text-[#1D1D1F] antialiased selection:bg-[#0066CC]/20 selection:text-[#0066CC] font-sans;
+  }
+}
